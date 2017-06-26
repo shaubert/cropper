@@ -29,7 +29,7 @@ Installation
 	}
 
 	dependencies {
-	  compile 'com.shaubert.edmodo.cropper.fork:library:1.0.3'
+	  compile 'com.shaubert.edmodo.cropper.fork:library:1.0.4'
 	}
 	
 
