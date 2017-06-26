@@ -25,12 +25,13 @@ Installation
 **build.gradle**
 
 	repositories {
-		mavenCentral()
+		maven{url "https://github.com/shaubert/maven-repo/raw/master/releases"}
 	}
 
 	dependencies {
-	  compile 'com.edmodo:cropper:1.0.1'
+	  compile 'com.shaubert.edmodo.cropper.fork:library:1.0.3'
 	}
+	
 
 License
 =======
