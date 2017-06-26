@@ -36,6 +36,8 @@ import com.edmodo.cropper.util.AspectRatioUtil;
 import com.edmodo.cropper.util.HandleUtil;
 import com.edmodo.cropper.util.PaintUtil;
 
+import static android.R.attr.scaleY;
+
 /**
  * Custom view that provides cropping capabilities to an image.
  */
@@ -255,46 +257,54 @@ public class CropImageView extends ImageView {
      * @return a new Bitmap representing the cropped image
      */
     public Bitmap getCroppedImage() {
-
         // Implementation reference: http://stackoverflow.com/a/26930938/1068656
-
         final Drawable drawable = getDrawable();
         if (drawable == null || !(drawable instanceof BitmapDrawable)) {
             return null;
+        }
+
+        RectF rect = getActualCropRect();
+        if (rect.width() == 0 || rect.height() == 0) {
+            return null;
+        }
+
+        final Bitmap originalBitmap = ((BitmapDrawable) drawable).getBitmap();
+        return Bitmap.createBitmap(originalBitmap,
+                                   (int) rect.left,
+                                   (int) rect.top,
+                                   (int) rect.width(),
+                                   (int) rect.height());
+    }
+
+    public RectF getActualCropRect() {
+        final Drawable drawable = getDrawable();
+        if (drawable == null || !(drawable instanceof BitmapDrawable)) {
+            return new RectF();
         }
 
         // Get image matrix values and place them in an array.
         final float[] matrixValues = new float[9];
         getImageMatrix().getValues(matrixValues);
 
-        // Extract the scale and translation values. Note, we currently do not handle any other transformations (e.g. skew).
+        // Extract the scale and translation values from the matrix.
         final float scaleX = matrixValues[Matrix.MSCALE_X];
         final float scaleY = matrixValues[Matrix.MSCALE_Y];
         final float transX = matrixValues[Matrix.MTRANS_X];
         final float transY = matrixValues[Matrix.MTRANS_Y];
 
-        // Ensure that the left and top edges are not outside of the ImageView bounds.
-        final float bitmapLeft = (transX < 0) ? Math.abs(transX) : 0;
-        final float bitmapTop = (transY < 0) ? Math.abs(transY) : 0;
-
         // Get the original bitmap object.
         final Bitmap originalBitmap = ((BitmapDrawable) drawable).getBitmap();
 
         // Calculate the top-left corner of the crop window relative to the ~original~ bitmap size.
-        final float cropX = (bitmapLeft + Edge.LEFT.getCoordinate()) / scaleX;
-        final float cropY = (bitmapTop + Edge.TOP.getCoordinate()) / scaleY;
+        final float cropX = (Math.max(transX, 0) + Edge.LEFT.getCoordinate()) / scaleX;
+        final float cropY = (Math.max(transY, 0) + Edge.TOP.getCoordinate()) / scaleY;
 
         // Calculate the crop window size relative to the ~original~ bitmap size.
         // Make sure the right and bottom edges are not outside the ImageView bounds (this is just to address rounding discrepancies).
         final float cropWidth = Math.min(Edge.getWidth() / scaleX, originalBitmap.getWidth() - cropX);
         final float cropHeight = Math.min(Edge.getHeight() / scaleY, originalBitmap.getHeight() - cropY);
 
-        // Crop the subset from the original Bitmap.
-        return Bitmap.createBitmap(originalBitmap,
-                                   (int) cropX,
-                                   (int) cropY,
-                                   (int) cropWidth,
-                                   (int) cropHeight);
+        return new RectF(cropX, cropY, cropX + cropWidth, cropY + cropHeight);
     }
 
     // Private Methods /////////////////////////////////////////////////////////////////////////////
