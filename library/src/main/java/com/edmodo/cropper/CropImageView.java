@@ -16,12 +16,7 @@ package com.edmodo.cropper;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.PointF;
-import android.graphics.RectF;
+import android.graphics.*;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
@@ -29,14 +24,11 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.ImageView;
-
 import com.edmodo.cropper.cropwindow.edge.Edge;
 import com.edmodo.cropper.cropwindow.handle.Handle;
 import com.edmodo.cropper.util.AspectRatioUtil;
 import com.edmodo.cropper.util.HandleUtil;
 import com.edmodo.cropper.util.PaintUtil;
-
-import static android.R.attr.scaleY;
 
 /**
  * Custom view that provides cropping capabilities to an image.
@@ -293,10 +285,8 @@ public class CropImageView extends ImageView {
         final float transY = matrixValues[Matrix.MTRANS_Y];
 
         // Calculate the top-left corner of the crop window relative to the ~original~ bitmap size.
-        final float bitmapLeft = (transX < 0) ? Math.abs(transX) : 0;
-        final float bitmapTop = (transY < 0) ? Math.abs(transY) : 0;
-        final float cropX = (bitmapLeft + Edge.LEFT.getCoordinate()) / scaleX;
-        final float cropY = (bitmapTop + Edge.TOP.getCoordinate()) / scaleY;
+        final float cropX = (-transX + Edge.LEFT.getCoordinate()) / scaleX;
+        final float cropY = (-transY + Edge.TOP.getCoordinate()) / scaleY;
 
         // Get the original bitmap object.
         final Bitmap originalBitmap = ((BitmapDrawable) drawable).getBitmap();

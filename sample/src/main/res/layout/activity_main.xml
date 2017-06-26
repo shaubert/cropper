@@ -25,10 +25,9 @@
         <com.edmodo.cropper.CropImageView
             android:id="@+id/CropImageView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
             android:layout_marginTop="@dimen/content_padding"
-            android:adjustViewBounds="true"
-            android:scaleType="centerInside"
+            android:scaleType="centerCrop"
             android:src="@drawable/butterfly"/>
 
         <LinearLayout
