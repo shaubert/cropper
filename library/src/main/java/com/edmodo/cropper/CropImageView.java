@@ -292,12 +292,14 @@ public class CropImageView extends ImageView {
         final float transX = matrixValues[Matrix.MTRANS_X];
         final float transY = matrixValues[Matrix.MTRANS_Y];
 
+        // Calculate the top-left corner of the crop window relative to the ~original~ bitmap size.
+        final float bitmapLeft = (transX < 0) ? Math.abs(transX) : 0;
+        final float bitmapTop = (transY < 0) ? Math.abs(transY) : 0;
+        final float cropX = (bitmapLeft + Edge.LEFT.getCoordinate()) / scaleX;
+        final float cropY = (bitmapTop + Edge.TOP.getCoordinate()) / scaleY;
+
         // Get the original bitmap object.
         final Bitmap originalBitmap = ((BitmapDrawable) drawable).getBitmap();
-
-        // Calculate the top-left corner of the crop window relative to the ~original~ bitmap size.
-        final float cropX = (Math.max(transX, 0) + Edge.LEFT.getCoordinate()) / scaleX;
-        final float cropY = (Math.max(transY, 0) + Edge.TOP.getCoordinate()) / scaleY;
 
         // Calculate the crop window size relative to the ~original~ bitmap size.
         // Make sure the right and bottom edges are not outside the ImageView bounds (this is just to address rounding discrepancies).
