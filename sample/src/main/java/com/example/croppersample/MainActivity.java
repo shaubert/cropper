@@ -3,6 +3,7 @@ package com.example.croppersample;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -17,7 +18,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import androidx.annotation.NonNull;
+
 import com.edmodo.cropper.CropImageView;
+import com.edmodo.cropper.CropRectInitCallback;
 
 public class MainActivity extends Activity {
 
@@ -44,6 +48,22 @@ public class MainActivity extends Activity {
         final CropImageView cropImageView = (CropImageView) findViewById(R.id.CropImageView);
         final ImageView croppedImageView = (ImageView) findViewById(R.id.croppedImageView);
         final Button cropButton = (Button) findViewById(R.id.Button_crop);
+
+        cropImageView.setCropRectInitialCallback(new CropRectInitCallback() {
+            @NonNull
+            @Override
+            public RectF getCropRect(RectF bitmapRect, RectF defaultRect, float aspectX, float aspectY) {
+                if (aspectX != -1 || aspectY != -1) {
+                    return defaultRect;
+                }
+
+                return new RectF(defaultRect.left + defaultRect.width() * 0.1f,
+                        defaultRect.top + defaultRect.height() * 0.1f,
+                        defaultRect.right - defaultRect.width() * 0.1f,
+                        defaultRect.bottom - defaultRect.height() * 0.1f
+                );
+            }
+        });
 
         // Initializes fixedAspectRatio toggle button.
         fixedAspectRatioToggleButton.setOnCheckedChangeListener(new OnCheckedChangeListener() {
